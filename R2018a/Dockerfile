@@ -17,8 +17,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Add MCR intall files
-ADD MCR_${MCR_VERSION}.zip /mcr-install/mcr.zip
+# Add MCR installer
+## option 1) download automatically into layer
+RUN mkdir /mcr-install
+RUN wget https://www.mathworks.com/supportfiles/downloads/${MCR_VERSION}/deployment_files/${MCR_VERSION}/installers/glnxa64/MCR_${MCR_VERSION}_glnxa64_installer.zip -O /mcr-install/mcr.zip
+## option 2) add into layer after downloading manually
+#ADD MCR_${MCR_VERSION}.zip /mcr-install/mcr.zip
+
+# Add MCR config file
 ADD mcr-config.txt /mcr-install/mcr-config.txt
 
 # Install MatLab runtime
