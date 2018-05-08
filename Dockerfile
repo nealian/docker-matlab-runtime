@@ -6,10 +6,12 @@ ENV PATH           ${PATH}:${JAVA_HOME}/bin
 
 # Set MCR environment variables
 ENV MATLAB_JAVA    ${JAVA_HOME}
-ENV MCR_VERSION    R2015b
-ENV MCR_NUM        v90
+
+ARG MCR_VERSION
+ARG MCR_NUM
 
 # Install packages
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -17,15 +19,18 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Add MCR intall files
-ADD MCR_${MCR_VERSION}.zip /mcr-install/mcr.zip
-ADD mcr-config.txt /mcr-install/mcr-config.txt
+# Add MCR installer
+## option 1) download automatically into layer
+RUN mkdir /mcr-install
+RUN wget https://www.mathworks.com/supportfiles/downloads/${MCR_VERSION}/deployment_files/${MCR_VERSION}/installers/glnxa64/MCR_${MCR_VERSION}_glnxa64_installer.zip -O /mcr-install/mcr.zip
+## option 2) add into layer after downloading manually
+#ADD MCR_${MCR_VERSION}.zip /mcr-install/mcr.zip
 
 # Install MatLab runtime
 RUN cd /mcr-install \
     && unzip mcr.zip \
     && mkdir /opt/mcr \
-    && ./install -inputFile mcr-config.txt \
+    && ./install -v -mode silent -agreeToLicense yes -destinationFolder /opt/mcr/ \
     && cd / \
     && rm -rf /mcr-install
 
