@@ -10,6 +10,7 @@ ENV MCR_VERSION    R2018a
 ENV MCR_NUM        v94
 
 # Install packages
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -24,14 +25,11 @@ RUN wget https://www.mathworks.com/supportfiles/downloads/${MCR_VERSION}/deploym
 ## option 2) add into layer after downloading manually
 #ADD MCR_${MCR_VERSION}.zip /mcr-install/mcr.zip
 
-# Add MCR config file
-ADD mcr-config.txt /mcr-install/mcr-config.txt
-
 # Install MatLab runtime
 RUN cd /mcr-install \
     && unzip mcr.zip \
     && mkdir /opt/mcr \
-    && ./install -inputFile mcr-config.txt \
+    && ./install -v -mode silent -agreeToLicense yes -destinationFolder /opt/mcr/ \
     && cd / \
     && rm -rf /mcr-install
 
